@@ -33,7 +33,13 @@ sudo add-apt-repository \
 
 echo '安装最新docker'
 sudo apt-get update
-sudo apt-get install docker-ce docker-ce-cli containerd.io
+sudo apt-get install docker-ce docker-ce-cli containerd.io -y
+
+# 确认 Docker 安装成功
+if ! systemctl list-unit-files | grep -q 'docker.service'; then
+    echo "Docker service file not found, installation might have failed."
+    exit 1
+fi
 
 echo 'docker开机启动'
 sudo systemctl enable docker
