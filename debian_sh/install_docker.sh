@@ -48,7 +48,7 @@ echo '启动docker'
 sudo systemctl start docker
 
 echo 'docker国内源替换'
-sudo echo -e '{"registry-mirrors": ["https://dockerhub.azk8s.cn","https://reg-mirror.qiniu.com","https://registry.docker-cn.com"],"exec-opts": ["native.cgroupdriver=systemd"]}' > /etc/docker/daemon.json
+sudo echo -e '{"registry-mirrors": ["https://docker.registry.cyou"]}' > /etc/docker/daemon.json
 
 echo '重新加载docker配置文件'
 sudo systemctl daemon-reload

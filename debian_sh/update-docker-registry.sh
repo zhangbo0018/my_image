@@ -28,16 +28,17 @@ if [ ! -f /etc/docker/daemon.json ]; then
   echo "{}" | sudo tee /etc/docker/daemon.json > /dev/null
 fi
 
-# 读取现有的daemon.json文件内容
-existing_config=$(sudo cat /etc/docker/daemon.json)
+# 安装jq
+sudo apt install jq -y
 
-# 使用jq解析现有的配置并添加新的镜像源
-# 如果daemon.json文件为空或没有registry-mirrors字段，则创建该字段
-# 如果registry-mirrors字段已存在，则合并镜像源数组
-new_config=$(echo$existing_config | jq --argjson mirrors "${registry_mirrors[*]}" '. + { "registry-mirrors": ($mirrors | split(" ")) }')
+# 将镜像源数组转换为 JSON 数组字符串
+mirrors_json=$(printf '%s\n' "${registry_mirrors[@]}" | jq -R . | jq -s .)
+
+# 创建新的 JSON 配置，直接覆盖原有配置
+new_config=$(jq -n --argjson mirrors "$mirrors_json" '{ "registry-mirrors": $mirrors }')
 
 # 将新的配置写回daemon.json文件
-echo $new_config | sudo tee /etc/docker/daemon.json > /dev/null
+echo "$new_config" | sudo tee /etc/docker/daemon.json > /dev/null
 
 # 重启Docker服务以使配置生效
 sudo systemctl daemon-reload
